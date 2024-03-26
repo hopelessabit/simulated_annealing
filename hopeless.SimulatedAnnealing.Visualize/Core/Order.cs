@@ -4,7 +4,7 @@ public class Order
 {
     public int Id { get; set; }
     public string Name { get; }
-    public List<Step> Steps { get; set; }
+    public List<Step> Steps{ get; set;  }
     public double ExpectedDuration { get; }
     public int CurrentStep { get; set; }
     public double CompleteTime { get; set; }
@@ -82,7 +82,7 @@ public class Order
     {
 
         string a = $"{Id} - ExpectedDuration: {ExpectedDuration} - Current step: {CurrentStep} - Start Time: {StartTime} - Complete Time: {CompleteTime}\n";
-        foreach (var t in Steps)
+        foreach(var t in Steps)
         {
             a += "\t" + t.ToString() + "\n";
         }

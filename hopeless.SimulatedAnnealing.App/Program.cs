@@ -1,93 +1,133 @@
-﻿using System;
-using System.Runtime.CompilerServices;
-using System.Security.Cryptography.X509Certificates;
+﻿using OfficeOpenXml;
 
 public class Program
 {
     static Random random = new Random();
-    static int CurrentTime = 0;
-    public static void Main()
+    static int currentTime = 0;
+    static List<Order> bestSolution;
+
+    //public static void Main1(string[] args)
+    //{
+    //    List<Order> orders = new List<Order>
+    //    {
+    //        new Order(1, new List<Step>() { new Step(9), new Step(1), new Step(0), new Step(3) }, 7),
+    //        new Order(2, new List<Step>() { new Step(0), new Step(2), new Step(6), new Step(4) }, 13),
+    //        new Order(3, new List<Step>() { new Step(7), new Step(4), new Step(3), new Step(0) }, 17),
+    //        new Order(4, new List<Step>() { new Step(5), new Step(2), new Step(0), new Step(3) }, 10),
+    //        new Order(5, new List<Step>() { new Step(0), new Step(2), new Step(12), new Step(4) }, 14),
+    //        new Order(6, new List<Step>() { new Step(4), new Step(8), new Step(3), new Step(0) }, 10),
+    //        new Order(0, new List<Step>() { new Step(10), new Step(7), new Step(4), new Step(5) }, 10),
+    //    };
+
+    //    double initialTemperature = 1000;
+    //    double coolingRate = 0.003;
+    //    SimulatedAnnealing sa = new SimulatedAnnealing(orders, initialTemperature, coolingRate);
+    //    List<Order> bestOrder = sa.FindBestSolution();
+
+    //    Console.WriteLine("Best order: ");
+    //    Console.Write("Orders: "); bestOrder.ForEach(order => Console.Write(order.Id \t "\t"));
+    //}
+
+    public static void Main(string[] args)
     {
-        List<Step> a = new List<Step>() { new Step(2), new Step(0), new Step(4), new Step(5) };
+        List<Order> orders = ReadExcel();
+        //List<Order> orders = new List<Order>{
+        //    new Order(1, new List<Step>() { new Step(9), new Step(1), new Step(0), new Step(3), new Step(3), new Step(3) }, 7),
+        //    new Order(2, new List<Step>() { new Step(0), new Step(2), new Step(6), new Step(4), new Step(6), new Step(4) }, 13),
+        //    new Order(3, new List<Step>() { new Step(7), new Step(4), new Step(3), new Step(0), new Step(3), new Step(0) }, 17),
+        //    new Order(4, new List<Step>() { new Step(5), new Step(2), new Step(0), new Step(3), new Step(0), new Step(3) }, 10),
+        //    new Order(5, new List<Step>() { new Step(0), new Step(2), new Step(12), new Step(4), new Step(12), new Step(4) }, 14),
+        //    new Order(6, new List<Step>() { new Step(4), new Step(8), new Step(3), new Step(0), new Step(3), new Step(0) }, 10),
+        //    new Order(0, new List<Step>() { new Step(10), new Step(7), new Step(4), new Step(5), new Step(4), new Step(5) }, 10),
+        //};
 
-        List<Order> orders = new List<Order>
-        {
-            new Order("Order 1", new List<Step>() { new Step(2), new Step(0), new Step(4), new Step(5) }, 10),
-            new Order("Order 2", new List<Step>() { new Step(5), new Step(1), new Step(0), new Step(3) }, 7),
-            new Order("Order 3", new List<Step>() { new Step(0), new Step(2), new Step(6), new Step(4) }, 13),
-            new Order("Order 4", new List<Step>() { new Step(7), new Step(4), new Step(3), new Step(0) }, 17),
-            new Order("Order 5", new List<Step>() { new Step(5), new Step(2), new Step(0), new Step(3) }, 10),
-            new Order("Order 6", new List<Step>() { new Step(0), new Step(2), new Step(12), new Step(4) }, 14),
-            new Order("Order 7", new List<Step>() { new Step(4), new Step(8), new Step(3), new Step(0) }, 10)
-        };
+        double initialTemperature = 1000;
+        double coolingRate = 0.003;
+        SimulatedAnnealing sa = new SimulatedAnnealing(orders, initialTemperature, coolingRate, 2);
+        List<Order> bestOrder = sa.FindBestSolution();
 
-        List<Station> stations = new List<Station>
-        {
-            new Station("Station 1", 4),
-            new Station("Station 2", 4),
-            new Station("Station 3", 4)
-        };
-
-        ShuffleOrders(orders);
-
-
+        Console.WriteLine("Best order: ");
+        Console.Write("Orders: "); bestOrder.ForEach(order => Console.Write(order.Id + "\t"));
+        Console.ReadLine();
+        DrawGanttChart(bestOrder);
     }
-    static int CheckAvaiableMachine(int step, List<Station> stations)
+
+    static List<Order> ReadExcel()
     {
-        for (int i = 0; i < stations.Count; i++)
+        List<Order> result = new List<Order> ();
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        string filePath = @"C:\Users\mical\Downloads\B.xlsx";
+        using (ExcelPackage package = new ExcelPackage(new FileInfo(filePath)))
         {
-            if (stations[i].Machines[step].Status.Equals(MachineStatus.UNPROCESSING))
-                return i;
-        }
-        return -1; //-1 mean all the machines to process the step is not avaiable
-    }
-    static List<int> GetAvaiableMachine(int step, List<Station> stations)
-    {
-        List<int> result = new List<int>();
-        for (int i = 0; i < stations.Count; i++)
-        {
-            if (!stations[i].Machines[step].Status.Equals(MachineStatus.UNPROCESSING))
-                result.Add(i);
+            // Get the first worksheet (adjust sheet index if needed)
+            ExcelWorksheet worksheet = package.Workbook.Worksheets[0];
+
+            // Start reading data from a specific row (replace 1 with your starting row)
+            int currentRow = 1;
+
+            while (true)
+            {
+                //string check = worksheet.Cells[currentRow, 1].Value.ToString();
+                // Check if all cells are empty, signifying end of data
+                if (worksheet.Cells[currentRow, 1].Value == null)
+                {
+                    break;
+                }
+                // Read data from each cell in the current row
+                int orderId = int.Parse(worksheet.Cells[currentRow, 1].Value.ToString());
+                string orderName = worksheet.Cells[currentRow, 2].Value.ToString();
+                int quantity = int.Parse(worksheet.Cells[currentRow, 3].Value.ToString());
+                double expectCompleteTime = double.Parse(worksheet.Cells[currentRow, 4].Value.ToString());
+                double step1 = double.Parse((worksheet.Cells[currentRow, 5].Value.ToString()));
+                double step2 = double.Parse((worksheet.Cells[currentRow,6].Value.ToString()));
+                double step3 = double.Parse((worksheet.Cells[currentRow,7].Value.ToString()));
+                double step4 = double.Parse((worksheet.Cells[currentRow,8].Value.ToString()));
+                double step5 = double.Parse((worksheet.Cells[currentRow,9].Value.ToString()));
+                double step6 = double.Parse((worksheet.Cells[currentRow,10].Value.ToString()));
+                //Console.WriteLine($"{orderId} \t {orderName} \t {quantity} \t {expectCompleteTime} \t {step1} \t {step2} \t {step3} \t {step4} \t {step5} \t {step6}");
+                result.Add(new Order(orderId, orderName, new List<Step>() {new Step(step1), new Step(step2), new Step(step3), new Step(step4), new Step(step5), new Step(step6)}, expectCompleteTime));
+                currentRow++;
+            }
         }
         return result;
     }
-    static void PerformFirstProcessing(Order order, List<Station> stations, int avaiableMachineIndex)
+    public static void DrawGanttChart(List<Order> orders)
     {
-        stations[avaiableMachineIndex].Machines[0].MarkProcessing(0, order.Steps[0].RequireTime);
-        order.Steps[0].MarkProcessing(avaiableMachineIndex);
-    }
-    /*
-     * return true if last step.
-     */
-    static void SetOrderProcessing(int orderId, Order order, int stationId, List<Station> stations)
-    {
-        order.NextStep();
-        order.MarkStepProcessing(stationId);
-        stations[stationId].MarkProcessing(orderId, order);
-    }
-    static void SetProcessingFirstTime(int orderId, Order order, int stationId, List<Station> stations)
-    {
-        order.MarkStepProcessingFirstTime(stationId);
-        order.Steps[0].MarkProcessing(stationId);
-        stations[stationId].MarkProcessing(orderId, order);
-    }
-    static void SetProcessCompleted(Order order, int stationId, List<Station> station)
-    {
-        order.MarkComplete();
-        station[stationId].MarkComplete(order);
-    }
-    static void ShuffleOrders(List<Order> orders)
-    {
-        // Use Fisher-Yates shuffle algorithm to shuffle the orders
-        int n = orders.Count;
-        while (n > 1)
+        Console.WriteLine("Gantt Chart:");
+
+        // Calculate total processing time
+        double totalProcessingTime = 0;
+        foreach (var order in orders)
         {
-            n--;
-            int k = random.Next(n + 1);
-            Order temp = orders[k];
-            orders[k] = orders[n];
-            orders[n] = temp;
+            totalProcessingTime += (order.CompleteTime - order.StartTime);
+        }
+
+        // Define the width of the chart
+        int chartWidth = 60;
+
+        // Calculate scale factor to fit the chart within console width
+        double scaleFactor = (double)chartWidth / totalProcessingTime;
+
+        // Draw chart header
+        Console.WriteLine($"{"Order",-10} | {"Gantt Chart",-60}");
+        Console.WriteLine(new string('-', 72));
+
+        // Draw Gantt chart for each order
+        foreach (var order in orders)
+        {
+            // Calculate the number of characters to represent processing time
+            int numChars = (int)((order.CompleteTime - order.StartTime) * scaleFactor);
+
+            // Draw order ID
+            Console.Write($"{order.Id,-10} | ");
+
+            // Draw Gantt chart bar with color
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.Write(new string('#', numChars));
+            Console.ResetColor(); // Reset color
+
+            // Add padding if necessary
+            Console.WriteLine(new string(' ', chartWidth - numChars));
         }
     }
-
 }
