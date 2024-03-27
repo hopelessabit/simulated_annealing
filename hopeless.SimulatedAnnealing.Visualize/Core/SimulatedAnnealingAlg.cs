@@ -8,7 +8,7 @@ public class SimulatedAnnealingAlg
     private List<Order> orders;
     private double initialTemperature;
     private double coolingRate;
-    public static int MachinesPerStation = 2;
+    public static int MachinesPerStation = 5;
     public static Random random = new Random();
     public SimulatedAnnealingAlg(List<Order> orders, double initialTemperature, double coolingRate, int machinesPerStation)
     {
@@ -37,7 +37,7 @@ public class SimulatedAnnealingAlg
                 currentSolution = new List<Order>(CloneListOrder(newSolution));
             }
 
-            if (currentEnergy < neighborEnergy)
+            if (CalculateDelayedTimeV2(currentSolution) < CalculateDelayedTimeV2(newSolution))
             {
                 bestSolution = new List<Order>(CloneListOrder(currentSolution));
             }
@@ -94,9 +94,9 @@ public class SimulatedAnnealingAlg
     {
         if (neighborEnergy < currentEnergy)
         {
-            return 1.0;
+            return 1.0; //Always accept better solution
         }
-        return Math.Exp((currentEnergy - neighborEnergy) / temperature);
+        return Math.Exp((currentEnergy - neighborEnergy) / temperature); // Accept worse solutions with a probability based on temperature
     }
     private static void ProcessOrder(ref List<Order> orders, ref List<Station> stations, double currentTime)
     {
@@ -133,20 +133,20 @@ public class SimulatedAnnealingAlg
         {
             if (order.Status.Equals(OrderStatus.COMPLETE) || order.Steps.Any(step => step.Status.Equals(StepStatus.PROCESSING)))
                 continue;
-            else
+
+            avaiableMachine = null;
+            avaiableMachine = GetMachineAvaiableV3(order, stations);
+            if (avaiableMachine != null)
             {
-                avaiableMachine = null;
-                avaiableMachine = GetMachineAvaiableV3(order, stations);
-                if (avaiableMachine != null)
-                {
-                    order.MarkStepProcessingV2(avaiableMachine, currentTime);
-                    stations[order.CurrentStep].MarkProcessingV2(order);
-                }
+                order.MarkStepProcessingV2(avaiableMachine, currentTime);
+                avaiableMachine.MarkProcessing(order);
             }
         }
     }
     public static double CalculateDelayedTimeV2(List<Order> orders)
     {
+        //Debug.Write("\nOrder: \t");
+        //orders.ForEach(order => Debug.Write(order.Id +"\t"));
         List<Station> stations = new List<Station>();
         for (int i = 0; i < orders[0].Steps.Count; i++)
         {
@@ -154,20 +154,35 @@ public class SimulatedAnnealingAlg
         }
 
         double currentTime = 0;
-        Debug.Write("Order: "); orders.ForEach(order => Debug.Write(order.Id + "\t"));
         while (!AllOrderComplete(orders))
         {
             MarkProcessOrderV2(ref orders, ref stations, currentTime);
-            //Print(orders, stations, currentTime);
             currentTime = Processing(ref orders, ref stations, currentTime);
-            //Print(orders, stations, currentTime);
         }
         double delayTime = 0;
-        orders.ForEach(order =>
+        //Debug.WriteLine("");
+        foreach (Order o in orders)
         {
-            if (order.CompleteTime - order.StartTime - order.ExpectedDuration > 0)
-                delayTime += order.CompleteTime - order.StartTime - order.ExpectedDuration;
-        });
+            double cal = o.CompleteTime - o.StartTime - o.ExpectedDuration;
+            if (cal > 0)
+            {
+                delayTime += cal;
+                //Debug.Write($"{cal} + ");
+            }
+        }
+        //Debug.WriteLine("");
+
+        //orders.ForEach(order =>
+        //{
+        //    Debug.Write(order.ToString());
+        //});
+
+        Debug.WriteLine("=========================================== DELTA T: " + delayTime + " === TOTAL: " + orders.OrderByDescending(order => order.CompleteTime).FirstOrDefault().CompleteTime);
+        //orders.ForEach(order =>
+        //{
+        //    if (order.CompleteTime - order.StartTime - order.ExpectedDuration > 0)
+        //        delayTime += order.CompleteTime - order.StartTime - order.ExpectedDuration;
+        //});
         return delayTime;
     }
     public static double GetDeltaT(List<Order> orders)
@@ -211,16 +226,17 @@ public class SimulatedAnnealingAlg
                     smallestRemainingTime = machine.RemainingTime;
             }
         }
-        currentTime += smallestRemainingTime;
-        //Debug.WriteLine($"Smallest remaining time: {smallestRemainingTime}");
-        //stations.ForEach(station => Debug.WriteLine(station.ToString()));
         foreach (Station station in stations)
         {
             foreach (Machine machine in station.Machines)
             {
                 if (machine.RemainingTime == -1)
                     continue;
-                else if (machine.RemainingTime == smallestRemainingTime)
+                if (machine.RemainingTime != smallestRemainingTime)
+                {
+                    machine.RemainingTime -= smallestRemainingTime;
+                } 
+                else
                 {
                     Order order = null;
                     foreach (Order o in orders)
@@ -231,21 +247,15 @@ public class SimulatedAnnealingAlg
                     if (order == null)
                         continue;
                     machine.MarkComplete();
-                    //Debug.WriteLine($" ==============     AFTER PROCESSING     ==============\nStation {station.Id}:{machine.ToString()}\n" +
-                    //    $"{order.ToString()}");
                     if (order.CurrentStep == 5)
                     {
-                        order.MarkComplete(currentTime);
+                        order.MarkComplete(currentTime + smallestRemainingTime);
                     }
                     else
-                        order.MarkStepComplete(currentTime);
-                }
-                else
-                {
-                    machine.RemainingTime -= smallestRemainingTime;
-                    //Debug.WriteLine($" ==============     AFTER PROCESSING     ==============\nStation {station.Id}:{machine.ToString()}\n");
+                        order.MarkStepComplete(currentTime + smallestRemainingTime);
                 }
             }
+            currentTime += smallestRemainingTime;
         }
         return currentTime;
     }
@@ -332,7 +342,7 @@ public class SimulatedAnnealingAlg
         Station result = null;
         foreach (Station station in stations)
         {
-            if (station.Machines.Any(machine => machine.Id == (order.CurrentStep + 1) && machine.Status.Equals(MachineStatus.UNPROCESSING)))
+            if (station.Machines.Any(machine => machine.Id == (order.CurrentStep + 1) && machine.Status.Equals(MachineStatus.NONPROCESSING)))
             {
                 result = station;
                 break;
@@ -344,10 +354,14 @@ public class SimulatedAnnealingAlg
     {
         foreach (Station station in stations)
         {
-            if (station.Id == (order.CurrentStep + 1) && station.Machines.Any(machine => machine.Status.Equals(MachineStatus.UNPROCESSING)))
-                return station.Machines.FirstOrDefault(machine => machine.Status.Equals(MachineStatus.UNPROCESSING));
+            if (station.Id == (order.CurrentStep + 1) && CheckAvaiableMachineInStation(order, station))
+                return station.Machines.FirstOrDefault(machine => machine.Status.Equals(MachineStatus.NONPROCESSING));
         }
         return null;
+    }
+    private static bool CheckAvaiableMachineInStation(Order order, Station station)
+    {
+        return station.Machines.Any(machine => machine.Status.Equals(MachineStatus.NONPROCESSING));
     }
     private static List<Order> ShuffleOrders(List<Order> orders)
     {

@@ -16,7 +16,7 @@ public class Station
     }
     public bool AreAnyMachineAvaiable()
     {
-        return Machines.FirstOrDefault(machine => machine.Status.Equals(MachineStatus.UNPROCESSING)) == null ? false : true;
+        return Machines.Any(machine => machine.Status.Equals(MachineStatus.NONPROCESSING));
     }
     public void MarkProcessing(Order order)
     {
@@ -26,7 +26,7 @@ public class Station
     }
     public void MarkProcessingV2(Order order)
     {
-        Machines.First(machine => machine.Status.Equals(MachineStatus.UNPROCESSING))
+        Machines.First(machine => machine.Status.Equals(MachineStatus.NONPROCESSING))
             .MarkProcessing(order);
         //Console.WriteLine($"=============           STATION [{this.Id}] PROCESSING           =============\n{this.ToString()}");
     }
@@ -38,6 +38,16 @@ public class Station
     public void MarkComplete(Machine machine)
     {
         machine.MarkComplete();
+    }
+
+    public Machine GetAvaiableMachine(Order order)
+    {
+        return Machines.FirstOrDefault(machine => machine.Status.Equals(MachineStatus.NONPROCESSING));
+    }
+
+    public double GetSmallestRemainingTime()
+    {
+        return Machines.Where(machine => machine.Status.Equals(MachineStatus.PROCESSING)).Select(machine => machine.RemainingTime).Min();
     }
     public override string ToString()
     {

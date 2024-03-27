@@ -23,15 +23,28 @@ namespace hopeless.SimulatedAnnealing.Visualize
             InitializeComponent();
             List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate);
 
-            double time = GetDeltaT(bestOrders, numberOfMachines, _initTem, _coolingRate);
+            double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
             Debug.WriteLine("Delta T: "+time.ToString("F3"));
-            InitializeGanttChart(bestOrders);
+            InitializeOrderHasColorChart(bestOrders);
         }
-        public List<Order> Process(int numberOfMachines, string filePath, double initialTemperature, double coolingRate) { 
+        public List<Order> Process(int numberOfMachines, string filePath, double initialTemperature, double coolingRate) {
 
             List<Order> orders = Extenstions.ReadExcelV2(filePath);
-            SimulatedAnnealingAlg sa = new SimulatedAnnealingAlg(orders, initialTemperature, coolingRate, numberOfMachines);
-            return sa.FindBestSolution();
+            //List<Order> orders = new List<Order>
+            //    {
+            //        new Order(1, new List<Step>() { new Step(9, 1), new Step(1, 2), new Step(0, 3), new Step(3, 4),new Step(0, 3), new Step(3, 4)}, 7),
+            //        new Order(2, new List<Step>() { new Step(0, 1), new Step(6, 2), new Step(11, 3), new Step(4, 4),new Step(6, 3), new Step(4, 4)}, 13),
+            //        new Order(3, new List<Step>() { new Step(7, 1), new Step(4, 2), new Step(3, 3), new Step(0, 4),new Step(3, 3), new Step(0, 4)}, 17),
+            //        new Order(4, new List<Step>() { new Step(5, 1), new Step(2, 2), new Step(0, 3), new Step(3, 4),new Step(0, 3), new Step(3, 4)}, 10),
+            //        new Order(5, new List<Step>() { new Step(0, 1), new Step(2, 2), new Step(12, 3), new Step(4, 4),new Step(12, 3), new Step(4, 4)}, 14),
+            //        new Order(6, new List<Step>() { new Step(4, 1), new Step(8, 2), new Step(3, 3), new Step(0, 4),new Step(3, 3), new Step(0, 4)}, 10),
+            //        new Order(0, new List<Step>() { new Step(10, 1), new Step(7, 2), new Step(4, 3), new Step(5, 4), new Step(4, 3), new Step(5, 4)}, 10),
+            //    };
+            //SimulatedAnnealingAlg sa = new SimulatedAnnealingAlg(orders, initialTemperature, coolingRate, numberOfMachines);
+            //return sa.FindBestSolution();
+
+            SimulatedAnnealingAlgV2.Init(orders, initialTemperature, 0.003, 5);
+            return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV2();
             //return sa.TheProcesser(orders);
         }
         public double GetDeltaT(List<Order> orders, int numberOfMachines, double initialTemperature, double coolingRate) {
@@ -39,17 +52,18 @@ namespace hopeless.SimulatedAnnealing.Visualize
             return SimulatedAnnealingAlg.CalculateDelayedTimeV2(orders);
         }
 
-        private void InitializeGanttChart(List<Order> orders)
+        private void InitializeOrderHasColorChart(List<Order> orders)
         {
             
             double biggestTime = orders.OrderByDescending(order => order.CompleteTime).FirstOrDefault().CompleteTime;
             // Set up the Gantt chart area
-            GanttChart chart = new GanttChart(biggestTime);
+            OrderHasColorChart chart = new OrderHasColorChart(biggestTime);
             chart.Dock = DockStyle.Fill;
             Controls.Add(chart);
             Color.FromArgb(1,1,1);
             // Add tasks to the Gantt chart
             List<Color> colors = new List<Color>();
+            List<OrderHasColor> orderColors = new List<OrderHasColor>();
             for (int i = 0; i < orders.Count;  i++)
             {
                 colors.Add(Color.FromArgb(random.Next(0, 200), random.Next(0, 200), random.Next(0, 200)));
@@ -60,109 +74,11 @@ namespace hopeless.SimulatedAnnealing.Visualize
                 {
                     chart.AddTask(colors[j], orders[j].Steps[i], i, j, i); 
                 }
+                orderColors.Add(new OrderHasColor(orders[j].Name, colors[j]));
             }
 
             // Add more tasks as needed
         }
     }
 
-    public class GanttChart : UserControl
-    {
-        private static int A = 0;
-        private readonly Pen taskPen = new Pen(Color.Black);
-        private readonly Brush taskBrush = new SolidBrush(Color.LightBlue);
-        private readonly Font taskFont = new Font("Arial", 8);
-        private readonly int taskHeight = 20;
-        private double TotalTime { get; set; }
-
-        public GanttChart(double totalTime)
-        {
-            TotalTime = totalTime;
-        }
-
-        private struct Task
-        {
-            public Color Color;
-            public double StartTime;
-            public double EndTime;
-            public int StationId;
-            public int MachineId;
-            public int OrderId;
-            public int StepId;
-        }
-
-        private readonly System.Collections.Generic.List<Task> tasks = new System.Collections.Generic.List<Task>();
-
-        public void AddTask(string name, Color color, double startTime, double endTime)
-        {
-            tasks.Add(new Task { Color = color, StartTime = startTime, EndTime = endTime });
-            Invalidate();
-        }
-        public void AddTask(Color color, Step step, int id, int orderId, int stepId)
-        {
-            tasks.Add(new Task {Color = color, 
-                StartTime = step.StartTime, 
-                EndTime = step.CompleteTime, 
-                StationId = id, 
-                MachineId = step.MachineProcess,
-                OrderId = orderId,
-                StepId = stepId
-            });
-            Invalidate();
-        }
-        protected override void OnPaint(PaintEventArgs e)
-        {
-            base.OnPaint(e);
-
-            Graphics g = e.Graphics;
-            g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), 0, 0, 1920, 1080);
-
-            for (int i = 0; i < 6; i++)
-            {
-                int startY = 150 * i + 18;
-                int height = 120;
-
-                float startX = 200;
-                float width = 1400;
-                string[] stationName = new string[6] { "Spinning machine", "Prod68 1", "Prod68 2", "Prod59", "Sizing, ironing", "Packaging"};
-                g.FillRectangle(new SolidBrush(Color.FromArgb(255, 209, 209, 224)), startX, startY, width, height);
-                //g.DrawString($"Station no.{i}", taskFont, Brushes.Black, 75, 75 + 150 * i);
-                g.DrawString($"{stationName[i]}", taskFont, Brushes.Black, 75, 75 + 150 * i);
-            }
-
-            for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
-            {
-                int startY = 18;
-                int height = 150 * 6;
-
-                float startX = 400 + (float) (1400 / Math.Ceiling(TotalTime / 57600) * i);
-                float width = 3;
-                g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
-                g.DrawString($"0{3 + i}/05/2023", taskFont, Brushes.Black, (float) (170 + i * (1400 / Math.Ceiling(TotalTime / 57600))) , 155 + 150 * 5);
-            }
-                g.DrawString($"0{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/05/2023", taskFont, Brushes.Black, 1550, 155 + 150 * 5);
-
-
-            //Draw tasks
-            for (int i = 0; i < tasks.Count; i++)
-            {
-                Task task = tasks[i];
-                int startY = (task.StationId) * (130 + 20) + (task.MachineId) * (20 + 3) + 20;
-                int height = taskHeight;
-
-
-                float startX = (float)(task.StartTime / TotalTime * 1400) + 200;
-                float width = (float)((task.EndTime - task.StartTime) * 1400/ TotalTime);
-                if (width < 1 && ((task.EndTime - task.StartTime) != 0)) width = 1;
-                g.FillRectangle(new SolidBrush(task.Color), startX, startY, width, height);
-                //Debug.WriteLine($"x={startX}\t\t: y={startY}\t\t-\t\twitdh=({task.EndTime} - {task.StartTime})/{TotalTime}*1400 = {width}");
-                Debug.Write($"{task.OrderId},{task.StepId}:{task.EndTime.ToString("F3")}\t\t -\t\t {task.StartTime.ToString("F3")}\t\t");
-                Debug.WriteLine((float)((task.EndTime - task.StartTime) * 1400 / TotalTime));
-                // Draw task name
-                //g.DrawString($"{((task.EndTime - task.StartTime) / TotalTime).ToString("0.00")}", taskFont, Brushes.Black, startX, startY + height);
-            }
-            g.DrawString($"{TotalTime}", taskFont, Brushes.Black, 0, 0);
-            g.FillRectangle(new SolidBrush(tasks[0].Color), 200, 11, (float)(TotalTime/TotalTime * 1400), 10);
-        }
-    }
 }

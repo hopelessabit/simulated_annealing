@@ -7,7 +7,7 @@
     public Machine(int id)
     {
         Id = id;
-        Status = MachineStatus.UNPROCESSING;
+        Status = MachineStatus.NONPROCESSING;
         RemainingTime = -1;
         OrderId = -1;
     }
@@ -19,7 +19,7 @@
     }
     public void MarkComplete()
     {   
-        Status = MachineStatus.UNPROCESSING;
+        Status = MachineStatus.NONPROCESSING;
         RemainingTime = -1;
         OrderId = -1;
     }
