@@ -21,6 +21,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
             _initTem = initTem;
             _coolingRate = coolingRate;
             InitializeComponent();
+
             List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate);
 
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
@@ -33,21 +34,8 @@ namespace hopeless.SimulatedAnnealing.Visualize
         public List<Order> Process(int numberOfMachines, string filePath, double initialTemperature, double coolingRate) {
 
             List<Order> orders = Extenstions.ReadExcelV2(filePath);
-            //List<Order> orders = new List<Order>
-            //    {
-            //        new Order(1, new List<Step>() { new Step(9, 1), new Step(1, 2), new Step(0, 3), new Step(3, 4),new Step(0, 3), new Step(3, 4)}, 7),
-            //        new Order(2, new List<Step>() { new Step(0, 1), new Step(6, 2), new Step(11, 3), new Step(4, 4),new Step(6, 3), new Step(4, 4)}, 13),
-            //        new Order(3, new List<Step>() { new Step(7, 1), new Step(4, 2), new Step(3, 3), new Step(0, 4),new Step(3, 3), new Step(0, 4)}, 17),
-            //        new Order(4, new List<Step>() { new Step(5, 1), new Step(2, 2), new Step(0, 3), new Step(3, 4),new Step(0, 3), new Step(3, 4)}, 10),
-            //        new Order(5, new List<Step>() { new Step(0, 1), new Step(2, 2), new Step(12, 3), new Step(4, 4),new Step(12, 3), new Step(4, 4)}, 14),
-            //        new Order(6, new List<Step>() { new Step(4, 1), new Step(8, 2), new Step(3, 3), new Step(0, 4),new Step(3, 3), new Step(0, 4)}, 10),
-            //        new Order(0, new List<Step>() { new Step(10, 1), new Step(7, 2), new Step(4, 3), new Step(5, 4), new Step(4, 3), new Step(5, 4)}, 10),
-            //    };
-            //SimulatedAnnealingAlg sa = new SimulatedAnnealingAlg(orders, initialTemperature, coolingRate, numberOfMachines);
-            //return sa.FindBestSolution();
-
-            SimulatedAnnealingAlgV2.Init(orders, initialTemperature, 0.003, numberOfMachines);
-            return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV2();
+            SimulatedAnnealingAlgV2.Init(orders, initialTemperature, coolingRate, numberOfMachines);
+            return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV3();
             //return sa.TheProcesser(orders);
         }
         public double GetDeltaT(List<Order> orders, int numberOfMachines, double initialTemperature, double coolingRate) {

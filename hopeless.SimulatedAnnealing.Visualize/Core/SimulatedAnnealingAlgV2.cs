@@ -80,6 +80,35 @@ public static class SimulatedAnnealingAlgV2
                 currentEnergy = neighborEnergy;
             }
             Debug.WriteLine($"current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")}");
+
+            temp *= 1 - CoolingRate;
+        }
+
+        Debug.WriteLine("\n");
+        currentSolutionFactory.Orders.ForEach(o => Debug.Write($"{o.Id} -> "));
+        return currentSolutionFactory.Orders;
+    }
+    public static List<Order> PerformSimulatedAnnealingAlgorithmV3()
+    { 
+        double temp = InitialTemperature;
+        Factory currentSolutionFactory = new Factory(MainOrderList, MachinesPerStation);
+        double currentEnergy = currentSolutionFactory.CalculateOverdueTime();
+        while (temp > 1)
+        {
+            Factory neighborSolutionFactory = new Factory(GenerateNeighbor(currentSolutionFactory.Orders), MachinesPerStation);
+            double neighborEnergy = neighborSolutionFactory.CalculateOverdueTime();
+
+            double acceptanceProbability = AcceptanceProbability(currentEnergy, neighborEnergy, temp);
+            double r = Random.NextDouble();
+            Debug.Write($"current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")} \t\t\t|{r.ToString("F3")} < {acceptanceProbability.ToString("F3")} : {r < acceptanceProbability} |\t\t\t");
+            if (r < acceptanceProbability)
+            {
+                Debug.WriteLine("==== " + (r < acceptanceProbability).ToString());
+                currentSolutionFactory = neighborSolutionFactory;
+                currentEnergy = neighborEnergy;
+            }
+
+            temp *= (1 - CoolingRate);
         }
 
         Debug.WriteLine("\n");
@@ -127,11 +156,12 @@ public static class SimulatedAnnealingAlgV2
     /// <returns></returns>
     public static double AcceptanceProbability(double currentEnergy, double neighborEnergy, double temperature)
     {
-        if (neighborEnergy < currentEnergy)
+        if (neighborEnergy < currentEnergy) //chac chan se lay nho hon
         {
             return 1.0;
         }
-        return Math.Exp((currentEnergy - neighborEnergy) / temperature);
+        var a =  Math.Exp((currentEnergy - neighborEnergy) / (temperature));
+        return Math.Exp((currentEnergy - neighborEnergy) / (temperature));
     }
 
     /// <summary>

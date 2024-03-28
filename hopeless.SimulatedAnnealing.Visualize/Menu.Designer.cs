@@ -117,7 +117,7 @@
             txbCoolingRate.Name = "txbCoolingRate";
             txbCoolingRate.Size = new System.Drawing.Size(131, 23);
             txbCoolingRate.TabIndex = 10;
-            txbCoolingRate.Text = "0.03";
+            txbCoolingRate.Text = "0.003";
             // 
             // label4
             // 
