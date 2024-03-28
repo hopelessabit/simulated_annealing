@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using OfficeOpenXml.Style;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -65,7 +66,7 @@ public static class SimulatedAnnealingAlgV2
         double temp = InitialTemperature;
         Factory currentSolutionFactory = new Factory(MainOrderList, MachinesPerStation);
         double currentEnergy = currentSolutionFactory.CalculateOverdueTime();
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 120; i++)
         { 
             Factory neighborSolutionFactory = new Factory(GenerateNeighbor(currentSolutionFactory.Orders), MachinesPerStation);
             double neighborEnergy = neighborSolutionFactory.CalculateOverdueTime();
@@ -80,6 +81,9 @@ public static class SimulatedAnnealingAlgV2
             }
             Debug.WriteLine($"current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")}");
         }
+
+        Debug.WriteLine("\n");
+        currentSolutionFactory.Orders.ForEach(o => Debug.Write($"{o.Id} -> "));
         return currentSolutionFactory.Orders;
     }
 
@@ -89,24 +93,14 @@ public static class SimulatedAnnealingAlgV2
     /// <param name="order">The order must be complete</param>
     /// <returns>Return 0 if (process time '<' expected duration)</returns>
     /// <returns></returns>
-    public static double CalculateOverdueTime(Order order)
-    {
-        if ((order.CompleteTime - order.StartTime) > order.ExpectedDuration)
-            return (order.CompleteTime - order.StartTime);
-        return 0;
-    }
 
-    /// <summary>
-    /// Calculate the overdue time of all list
-    /// </summary>
-    /// <param name="orders">Order's list which is processed</param>
-    /// <returns>Overdue Time</returns>
     public static double CalculateOverdueTime(List<Order> orders)
     {
         double overdueTime = 0;
         orders.ForEach(order =>
         {
-            overdueTime += CalculateOverdueTime(order);
+            if (order.CompleteTime - order.StartTime - order.ExpectedDuration > 0)
+                overdueTime += order.CompleteTime - order.StartTime - order.ExpectedDuration;
         });
         return overdueTime;
     }

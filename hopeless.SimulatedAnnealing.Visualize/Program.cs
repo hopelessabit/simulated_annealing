@@ -15,11 +15,11 @@ namespace hopeless.SimulatedAnnealing.Visualize
         [STAThread]
         static void Main()
         {
-            //Application.SetHighDpiMode(HighDpiMode.SystemAware);
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new Menu());
-            Application.Run(new Form1(5, @"C:\Users\mical\Downloads\B.xlsx", 1000, 0.003));
+            Application.SetHighDpiMode(HighDpiMode.SystemAware);
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+            Application.Run(new Menu());
+            // Application.Run(new Form1(5, @"C:\Users\mical\Downloads\B.xlsx", 1000, 0.003));
 
 
             //List<Order> orders = new List<Order>

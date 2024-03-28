@@ -100,14 +100,14 @@ public class Order
     {
         List<Step> clonedSteps = new List<Step>();
         Steps.ForEach(step => clonedSteps.Add(step.Clone()));
-        return new Order(Id, clonedSteps, ExpectedDuration);
+        return new Order(Id, Name, clonedSteps, ExpectedDuration);
     }
 
     public static Order CloneOrder(Order order)
     {
         List<Step> steps = new List<Step>();
         order.Steps.ForEach(step => steps.Add(Step.CloneStep(step)));
-        return new Order(order.Id, steps, order.ExpectedDuration);
+        return new Order(order.Id, order.Name, steps, order.ExpectedDuration);
     }
     public override string? ToString()
     {

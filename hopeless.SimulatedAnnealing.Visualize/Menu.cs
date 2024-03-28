@@ -43,7 +43,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
         private void btnProcess_Click(object sender, EventArgs e)
         {
             Form1 form = new Form1(int.Parse(tbNumberOfMachine.Text), tbSelectFIle.Text, double.Parse(txbInitTemp.Text), double.Parse(txbCoolingRate.Text));
-            form.ShowDialog();
+            form.Show();
         }
 
         private void label3_Click(object sender, EventArgs e)

@@ -25,7 +25,10 @@ namespace hopeless.SimulatedAnnealing.Visualize
 
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
             Debug.WriteLine("Delta T: "+time.ToString("F3"));
-            InitializeOrderHasColorChart(bestOrders);
+            Debug.WriteLine("\n");
+            bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
+            List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
+            new OrderColor(orderHasColors).Show();
         }
         public List<Order> Process(int numberOfMachines, string filePath, double initialTemperature, double coolingRate) {
 
@@ -43,7 +46,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
             //SimulatedAnnealingAlg sa = new SimulatedAnnealingAlg(orders, initialTemperature, coolingRate, numberOfMachines);
             //return sa.FindBestSolution();
 
-            SimulatedAnnealingAlgV2.Init(orders, initialTemperature, 0.003, 5);
+            SimulatedAnnealingAlgV2.Init(orders, initialTemperature, 0.003, numberOfMachines);
             return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV2();
             //return sa.TheProcesser(orders);
         }
@@ -52,12 +55,11 @@ namespace hopeless.SimulatedAnnealing.Visualize
             return SimulatedAnnealingAlg.CalculateDelayedTimeV2(orders);
         }
 
-        private void InitializeOrderHasColorChart(List<Order> orders)
+        private List<OrderHasColor> InitializeGanttChart(List<Order> orders)
         {
-            
             double biggestTime = orders.OrderByDescending(order => order.CompleteTime).FirstOrDefault().CompleteTime;
             // Set up the Gantt chart area
-            OrderHasColorChart chart = new OrderHasColorChart(biggestTime);
+            GanttChart chart = new GanttChart(biggestTime, SimulatedAnnealingAlgV2.CalculateOverdueTime(orders));
             chart.Dock = DockStyle.Fill;
             Controls.Add(chart);
             Color.FromArgb(1,1,1);
@@ -76,8 +78,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
                 }
                 orderColors.Add(new OrderHasColor(orders[j].Name, colors[j]));
             }
-
-            // Add more tasks as needed
+            return orderColors;
         }
     }
 

@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using System;
 using System.Diagnostics;
 
-public class OrderHasColorChart1 : UserControl
+public class GanttChart : UserControl
 {
     private static int A = 0;
     private readonly Pen taskPen = new Pen(Color.Black);
@@ -11,10 +11,12 @@ public class OrderHasColorChart1 : UserControl
     private readonly Font taskFont = new Font("Arial", 8);
     private readonly int taskHeight = 20;
     private double TotalTime { get; set; }
+    private double OverdueTime { get; set; }
 
-    public OrderHasColorChart1(double totalTime)
+    public GanttChart(double totalTime, double overdueTime)
     {
         TotalTime = totalTime;
+        OverdueTime = overdueTime;
     }
 
     private struct Task
@@ -98,5 +100,6 @@ public class OrderHasColorChart1 : UserControl
             Debug.WriteLine((float)((task.EndTime - task.StartTime) * 1400 / TotalTime));
         }
         g.DrawString($"Total Time(s): {TotalTime.ToString("F3")}", taskFont, Brushes.Black, 0, 0);
+        g.DrawString($"Overdue Time(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
     }
 }
