@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using OfficeOpenXml.Style;
+using OfficeOpenXml.Table.PivotTable;
+using OxyPlot;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -88,11 +90,13 @@ public static class SimulatedAnnealingAlgV2
         currentSolutionFactory.Orders.ForEach(o => Debug.Write($"{o.Id} -> "));
         return currentSolutionFactory.Orders;
     }
-    public static List<Order> PerformSimulatedAnnealingAlgorithmV3()
+    public static List<Order> PerformSimulatedAnnealingAlgorithmV3(out List<DataPoint> tempPoints)
     { 
         double temp = InitialTemperature;
+        tempPoints = new List<DataPoint>();
         Factory currentSolutionFactory = new Factory(MainOrderList, MachinesPerStation);
         double currentEnergy = currentSolutionFactory.CalculateOverdueTime();
+        int count = 0;
         while (temp > 1)
         {
             Factory neighborSolutionFactory = new Factory(GenerateNeighbor(currentSolutionFactory.Orders), MachinesPerStation);
@@ -107,9 +111,13 @@ public static class SimulatedAnnealingAlgV2
                 currentSolutionFactory = neighborSolutionFactory;
                 currentEnergy = neighborEnergy;
             }
-
+            if (++count % 50 == 0 || count == 1)   
+            {
+                tempPoints.Add(new DataPoint(count, Math.Round(currentEnergy / 100, 2)));
+            }
             temp *= (1 - CoolingRate);
         }
+        tempPoints.Add(new DataPoint(count, Math.Round(currentEnergy / 100, 2)));
 
         Debug.WriteLine("\n");
         currentSolutionFactory.Orders.ForEach(o => Debug.Write($"{o.Id} -> "));
@@ -191,5 +199,16 @@ public static class SimulatedAnnealingAlgV2
         List<Order> result = new List<Order>();
         orders.ForEach(order => result.Add(order.Clone()));
         return result;
+    }
+
+}
+public class TempPoint
+{
+    public double Temp {  get; set; }
+    public int LoopCount {  get; set; }
+    public TempPoint(double temp, int loopNumber)
+    {
+        Temp = temp;
+        LoopCount = loopNumber;
     }
 }

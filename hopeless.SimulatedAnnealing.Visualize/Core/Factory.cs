@@ -8,6 +8,7 @@ public class Factory
     public List<Order> Orders { get; set; }
     public List<Station> Stations { get; set; }
     private double CurrentTime { get; set; } = 0;
+    private int MachinePerStations;
     private Random Random { get; set; } = new Random();
     public Factory(List<Order> orders, List<Station> stations)
     {
@@ -18,6 +19,7 @@ public class Factory
     {
         Orders = CloneListOrder(orders);
         Stations = new List<Station>();
+        MachinePerStations = machinePerStations;
         for (int i = 0; i < orders[0].Steps.Count; i++)
         {
             Stations.Add(new Station(i, machinePerStations));

@@ -34,7 +34,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
 
         private void ThisForm_Show(object sender, EventArgs e)
         {
-            this.Location = new Point(1000, 70);
+            this.Location = new Point(1100, 40);
             this.TopMost = true;
         }
     }

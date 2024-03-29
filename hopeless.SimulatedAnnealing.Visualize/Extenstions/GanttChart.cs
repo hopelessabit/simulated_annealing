@@ -10,15 +10,18 @@ public class GanttChart : UserControl
     private readonly Brush taskBrush = new SolidBrush(Color.LightBlue);
     private readonly Font taskFont = new Font("Arial", 8);
     private readonly int taskHeight = 20;
-    private double TotalTime { get; set; }
-    private double OverdueTime { get; set; }
+    private double TotalTime { get; set; } = 0;
+    private double OverdueTime { get; set; } = 0;
+    private int State { get; set; } //1: draw full process   |    2: draw first process
 
-    public GanttChart(double totalTime, double overdueTime)
+    public GanttChart(int state,double totalTime, double overdueTime)
     {
+        State = state;
         TotalTime = totalTime;
         OverdueTime = overdueTime;
     }
 
+    public GanttChart() { }
     private struct Task
     {
         public Color Color;
@@ -69,6 +72,47 @@ public class GanttChart : UserControl
             //g.DrawString($"Station no.{i}", taskFont, Brushes.Black, 75, 75 + 150 * i);
             g.DrawString($"{stationName[i]}", taskFont, Brushes.Black, 75, 75 + 150 * i);
         }
+        if (State == 1) DrawFullProcessGanttChart(g);
+        else DrawFirstProcessGanttChart(g);
+    }
+
+    public void DrawFullProcessGanttChart(Graphics g)
+    {
+
+        for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
+        {
+            int startY = 18;
+            int height = 150 * 6;
+
+            float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
+            float width = 3;
+            g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
+            g.DrawString($"{(3 + i).ToString("D2")}/05/2023", taskFont, Brushes.Black, (float)(170 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+        }
+        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/05/2023", taskFont, Brushes.Black, 1550, 155 + 150 * 5);
+
+
+        //Draw tasks
+        for (int i = 0; i < tasks.Count; i++)
+        {
+            Task task = tasks[i];
+            int startY = (task.StationId) * (130 + 20) + (task.MachineId) * (20 + 3) + 20;
+            int height = taskHeight;
+
+
+            float startX = (float)((task.StartTime / TotalTime * 1400) + 200);
+            float width = (float)((task.EndTime - task.StartTime) * 1400 / TotalTime);
+            if (width < 1 && ((task.EndTime - task.StartTime) != 0)) width = 1;
+            g.FillRectangle(new SolidBrush(task.Color), startX, startY, width, height);
+
+            Debug.Write($"{task.OrderId},{task.StepId}:{task.EndTime.ToString("F3")}\t\t -\t\t {task.StartTime.ToString("F3")}\t\t");
+            Debug.WriteLine((float)((task.EndTime - task.StartTime) * 1400 / TotalTime));
+        }
+        g.DrawString($"Total Time(s): {TotalTime.ToString("F3")}", taskFont, Brushes.Black, 0, 0);
+        g.DrawString($"Overdue Time(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
+    }
+    public void DrawFirstProcessGanttChart(Graphics g)
+    {
 
         for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
         {

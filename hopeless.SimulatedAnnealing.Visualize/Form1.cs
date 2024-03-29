@@ -1,4 +1,6 @@
-﻿using System;
+﻿using LiveCharts.Defaults;
+using OxyPlot;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -21,8 +23,9 @@ namespace hopeless.SimulatedAnnealing.Visualize
             _initTem = initTem;
             _coolingRate = coolingRate;
             InitializeComponent();
-
-            List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate);
+            this.Shown += ThisForm_Show;
+            List<DataPoint> tempPoints = new List<DataPoint>();
+            List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate, out tempPoints);
 
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
             Debug.WriteLine("Delta T: "+time.ToString("F3"));
@@ -30,27 +33,35 @@ namespace hopeless.SimulatedAnnealing.Visualize
             bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
             List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
             new OrderColor(orderHasColors).Show();
-        }
-        public List<Order> Process(int numberOfMachines, string filePath, double initialTemperature, double coolingRate) {
 
+            new FirstProcess(bestOrders, orderHasColors, time).Show();
+
+            new ObjectiveFunctionChart(tempPoints).Show();
+        }
+
+        private void ThisForm_Show(object sender, EventArgs e)
+        {
+            this.Location = new Point(0, 0);
+        }
+        public List<Order> Process(int numberOfMachines, string filePath, double initialTemperature, double coolingRate, out List<DataPoint> tempPoints) {
+
+            tempPoints = new List<DataPoint>();
             List<Order> orders = Extenstions.ReadExcelV2(filePath);
             SimulatedAnnealingAlgV2.Init(orders, initialTemperature, coolingRate, numberOfMachines);
-            return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV3();
+            return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV3(out tempPoints);
             //return sa.TheProcesser(orders);
         }
         public double GetDeltaT(List<Order> orders, int numberOfMachines, double initialTemperature, double coolingRate) {
             SimulatedAnnealingAlg.MachinesPerStation = numberOfMachines;
             return SimulatedAnnealingAlg.CalculateDelayedTimeV2(orders);
         }
-
         private List<OrderHasColor> InitializeGanttChart(List<Order> orders)
         {
             double biggestTime = orders.OrderByDescending(order => order.CompleteTime).FirstOrDefault().CompleteTime;
             // Set up the Gantt chart area
-            GanttChart chart = new GanttChart(biggestTime, SimulatedAnnealingAlgV2.CalculateOverdueTime(orders));
+            GanttChart chart = new GanttChart(1, biggestTime, SimulatedAnnealingAlgV2.CalculateOverdueTime(orders));
             chart.Dock = DockStyle.Fill;
             Controls.Add(chart);
-            Color.FromArgb(1,1,1);
             // Add tasks to the Gantt chart
             List<Color> colors = new List<Color>();
             List<OrderHasColor> orderColors = new List<OrderHasColor>();
