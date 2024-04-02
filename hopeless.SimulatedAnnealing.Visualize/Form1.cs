@@ -26,7 +26,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
             this.Shown += ThisForm_Show;
             List<DataPoint> tempPoints = new List<DataPoint>();
             List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate, out tempPoints);
-
+            List<Order> firstOrders = ProcessFirstList(numberOfMachines, filePath, _initTem, _coolingRate);
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
             Debug.WriteLine("Delta T: "+time.ToString("F3"));
             Debug.WriteLine("\n");
@@ -34,7 +34,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
             List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
             new OrderColor(orderHasColors).Show();
 
-            new FirstProcess(bestOrders, orderHasColors, time).Show();
+            new FirstProcess(firstOrders, orderHasColors, time).Show();
 
             new ObjectiveFunctionChart(tempPoints).Show();
         }
@@ -50,6 +50,12 @@ namespace hopeless.SimulatedAnnealing.Visualize
             SimulatedAnnealingAlgV2.Init(orders, initialTemperature, coolingRate, numberOfMachines);
             return SimulatedAnnealingAlgV2.PerformSimulatedAnnealingAlgorithmV3(out tempPoints);
             //return sa.TheProcesser(orders);
+        }
+        public List<Order> ProcessFirstList(int numberOfMachines, string filePath, double initialTemperature, double coolingRate)
+        {
+            List<Order> orders = Extenstions.ReadExcelV2(filePath);
+            SimulatedAnnealingAlgV2.Init(orders, initialTemperature, coolingRate, numberOfMachines);
+            return SimulatedAnnealingAlgV2.Process();
         }
         public double GetDeltaT(List<Order> orders, int numberOfMachines, double initialTemperature, double coolingRate) {
             SimulatedAnnealingAlg.MachinesPerStation = numberOfMachines;

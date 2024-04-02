@@ -123,6 +123,12 @@ public static class SimulatedAnnealingAlgV2
         currentSolutionFactory.Orders.ForEach(o => Debug.Write($"{o.Id} -> "));
         return currentSolutionFactory.Orders;
     }
+    public static List<Order> Process()
+    {
+        Factory factory = new Factory(MainOrderList, MachinesPerStation);
+        factory.FactoryProcess();
+        return factory.Orders;
+    }
 
     /// <summary>
     /// Calculate the overdue time of an order

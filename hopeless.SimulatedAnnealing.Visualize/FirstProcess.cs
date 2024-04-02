@@ -30,8 +30,10 @@ namespace hopeless.SimulatedAnnealing.Visualize
             // Add tasks to the Gantt chart
             for (int j = 0; j < orders.Count; j++)
             {
-                if (orders[j].StartTime == 0)
-                    chart.AddTask(orderHasColors[j].Color, orders[j].Steps[0], 0, j, 0);
+                for (int i = 0; i < orders[j].Steps.Count; i++)
+                {
+                    chart.AddTask(orderHasColors[j].Color, orders[j].Steps[i], i, j, i);
+                }
             }
         }
     }
