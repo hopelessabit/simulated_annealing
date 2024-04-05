@@ -34,7 +34,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
             List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
             new OrderColor(orderHasColors).Show();
 
-            new FirstProcess(firstOrders, orderHasColors, time).Show();
+            new FirstProcess(firstOrders, orderHasColors, SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrders)).Show();
 
             new ObjectiveFunctionChart(tempPoints).Show();
         }
