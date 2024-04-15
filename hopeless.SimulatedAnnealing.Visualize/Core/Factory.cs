@@ -95,8 +95,8 @@ public class Factory
         double overdueTime = 0;
         Orders.ForEach(order =>
         {
-            if (order.CompleteTime - order.StartTime - order.ExpectedDuration > 0)
-                overdueTime += order.CompleteTime - order.StartTime - order.ExpectedDuration;
+            if (order.CompleteTime - order.ExpectedDuration > 0)
+                overdueTime += order.CompleteTime - order.ExpectedDuration;
         });
         return overdueTime;
     }
