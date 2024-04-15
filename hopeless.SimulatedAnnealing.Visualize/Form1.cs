@@ -28,9 +28,6 @@ namespace hopeless.SimulatedAnnealing.Visualize
             List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate, out tempPoints);
             List<Order> firstOrders = ProcessFirstList(numberOfMachines, filePath, _initTem, _coolingRate);
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
-            Debug.WriteLine("Delta T: "+time.ToString("F3"));
-            Debug.WriteLine("\n");
-            bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
             List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
             new OrderColor(orderHasColors).Show();
 

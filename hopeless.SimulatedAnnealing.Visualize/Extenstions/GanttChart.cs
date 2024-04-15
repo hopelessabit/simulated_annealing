@@ -104,9 +104,6 @@ public class GanttChart : UserControl
             float width = (float)((task.EndTime - task.StartTime) * 1400 / TotalTime);
             if (width < 1 && ((task.EndTime - task.StartTime) != 0)) width = 1;
             g.FillRectangle(new SolidBrush(task.Color), startX, startY, width, height);
-
-            Debug.Write($"{task.OrderId},{task.StepId}:{task.EndTime.ToString("F3")}\t\t -\t\t {task.StartTime.ToString("F3")}\t\t");
-            Debug.WriteLine((float)((task.EndTime - task.StartTime) * 1400 / TotalTime));
         }
         g.DrawString($"Total Time(s): {TotalTime.ToString("F3")}", taskFont, Brushes.Black, 0, 0);
         g.DrawString($"Overdue Time(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
@@ -140,8 +137,6 @@ public class GanttChart : UserControl
             if (width < 1 && ((task.EndTime - task.StartTime) != 0)) width = 1;
             g.FillRectangle(new SolidBrush(task.Color), startX, startY, width, height);
 
-            Debug.Write($"{task.OrderId},{task.StepId}:{task.EndTime.ToString("F3")}\t\t -\t\t {task.StartTime.ToString("F3")}\t\t");
-            Debug.WriteLine((float)((task.EndTime - task.StartTime) * 1400 / TotalTime));
         }
         g.DrawString($"Total Time(s): {TotalTime.ToString("F3")}", taskFont, Brushes.Black, 0, 0);
         g.DrawString($"Overdue Time(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);

@@ -33,8 +33,8 @@ public static class SimulatedAnnealingAlgV2
         while (temp > 1)
         {
             List<Order> newSolution = GenerateNeighbor(currentSolution);
-            Factory currentSolutionFactory = new Factory(currentSolution, 4);
-            Factory newSolutionFactory = new Factory(newSolution, 4);
+            Factory currentSolutionFactory = new Factory(currentSolution, MachinesPerStation);
+            Factory newSolutionFactory = new Factory(newSolution, MachinesPerStation);
             double currentEnergy = currentSolutionFactory.CalculateOverdueTime();
             double neighborEnergy = newSolutionFactory.CalculateOverdueTime();
 
@@ -51,8 +51,8 @@ public static class SimulatedAnnealingAlgV2
                 Debug.WriteLine($"\t\taccept \t cur: {currentEnergy.ToString("F2")} - nei: {neighborEnergy.ToString("F2")} : {currentEnergy > neighborEnergy} ");
                 currentSolution = CloneListOrder(newSolution);
             }
-            currentSolutionFactory = new Factory(currentSolution, 4);
-            newSolutionFactory = new Factory(newSolution, 4);
+            currentSolutionFactory = new Factory(currentSolution, MachinesPerStation);
+            newSolutionFactory = new Factory(newSolution, MachinesPerStation);
             if (currentSolutionFactory.CalculateOverdueTime() < newSolutionFactory.CalculateOverdueTime())
             {
                 bestSolution = CloneListOrder(currentSolution);
@@ -104,7 +104,7 @@ public static class SimulatedAnnealingAlgV2
 
             double acceptanceProbability = AcceptanceProbability(currentEnergy, neighborEnergy, temp);
             double r = Random.NextDouble();
-            Debug.Write($"current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")} \t\t\t|{r.ToString("F3")} < {acceptanceProbability.ToString("F3")} : {r < acceptanceProbability} |\t\t\t");
+            Debug.Write($"current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")} \t\t|{r.ToString("F3")} < {acceptanceProbability.ToString("F3")} : {r < acceptanceProbability} |\t");
             if (r < acceptanceProbability)
             {
                 Debug.WriteLine("==== " + (r < acceptanceProbability).ToString());
