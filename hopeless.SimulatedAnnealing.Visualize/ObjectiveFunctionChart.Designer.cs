@@ -33,7 +33,7 @@
             // 
             // plotView1
             // 
-            plotView1.Location = new System.Drawing.Point(77, 21);
+            plotView1.Location = new System.Drawing.Point(131, 70);
             plotView1.Name = "plotView1";
             plotView1.PanCursor = System.Windows.Forms.Cursors.Hand;
             plotView1.Size = new System.Drawing.Size(536, 310);
@@ -47,6 +47,7 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.White;
             ClientSize = new System.Drawing.Size(800, 450);
             Controls.Add(plotView1);
             Name = "ObjectiveFunctionChart";

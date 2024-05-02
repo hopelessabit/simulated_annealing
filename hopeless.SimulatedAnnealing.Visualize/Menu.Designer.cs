@@ -64,6 +64,7 @@
             tbSelectFIle.Name = "tbSelectFIle";
             tbSelectFIle.Size = new System.Drawing.Size(565, 23);
             tbSelectFIle.TabIndex = 3;
+            tbSelectFIle.Text = "C:\\Users\\mical\\Downloads\\B-1.xlsx";
             // 
             // btnSelectFile
             // 
@@ -132,6 +133,7 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.White;
             ClientSize = new System.Drawing.Size(800, 266);
             Controls.Add(txbCoolingRate);
             Controls.Add(label4);

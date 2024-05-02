@@ -25,16 +25,17 @@ namespace hopeless.SimulatedAnnealing.Visualize
             InitializeComponent();
             this.Shown += ThisForm_Show;
             List<DataPoint> tempPoints = new List<DataPoint>();
-            List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate, out tempPoints);
             List<Order> firstOrders = ProcessFirstList(numberOfMachines, filePath, _initTem, _coolingRate);
+            List<Order> bestOrders = Process(numberOfMachines, filePath, _initTem, _coolingRate, out tempPoints);
+            Extenstions.WriteExcelWithEPPlus(@"C:\Data\OneDrive - a151620\Data\testExcel.xlsx", numberOfMachines, firstOrders, bestOrders);
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
             List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
             Debug.WriteLine("Delta T: " + time.ToString("F3"));
             Debug.WriteLine("\n");
             bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
-            new OrderColor(orderHasColors).Show();
+            //new OrderColor(orderHasColors).Show();
 
-            new FirstProcess(firstOrders, orderHasColors, SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrders)).Show();
+            //new FirstProcess(firstOrders, orderHasColors, SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrders)).Show();
 
             new ObjectiveFunctionChart(tempPoints).Show();
         }

@@ -34,8 +34,9 @@
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            BackColor = System.Drawing.Color.White;
             ClientSize = new System.Drawing.Size(1920, 1000);
-            Name = "Full Process";
+            Name = "Form1";
             Text = "Full Process";
             ResumeLayout(false);
         }

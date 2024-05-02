@@ -1,6 +1,9 @@
 ﻿using OfficeOpenXml;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 
 public class Extenstions
 {
@@ -94,7 +97,71 @@ public class Extenstions
         }
         return result;
     }
+    public static void WriteExcelWithEPPlus(string filePath, int numberOfMachines, List<Order> firstOrderList, List<Order> bestOrderList)
+    {
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        using (var package = new ExcelPackage())
+        {
+            // Create a new worksheet
+            var worksheet = package.Workbook.Worksheets.Add("FirstOrder");
+            worksheet.Cells[1, 1].Value = "Overdue";
+            worksheet.Cells[1, 2].Value = SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrderList);
+            ExtenstionsStation[,] extenstionsStations = WriteOutLine(package, worksheet, numberOfMachines);
+            WriteStationProcessOrder(package, worksheet, numberOfMachines, firstOrderList, extenstionsStations);
+            // Create a new worksheet
+            worksheet = package.Workbook.Worksheets.Add("BestOrder");
+            worksheet.Cells[1, 1].Value = "Overdue";
+            worksheet.Cells[1, 2].Value = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrderList);
+            extenstionsStations = WriteOutLine(package, worksheet, numberOfMachines);
+            WriteStationProcessOrder(package, worksheet, numberOfMachines, bestOrderList, extenstionsStations);
 
+            // Save the new workbook
+
+                string projectLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+                string projectDir = Path.GetDirectoryName(projectLocation);
+                string projectPath = string.Join("\\", projectDir.Split('\\').Take(projectDir.Split('\\').Length - 4)) + "\\Result\\Result.xlsx";
+
+                package.SaveAs(new FileInfo(projectPath));
+        }
+    }
+    public static ExtenstionsStation[,] WriteOutLine(ExcelPackage package, ExcelWorksheet worksheet, int numberOfMachines)
+    {
+        int plus = 0;
+        if (numberOfMachines % 2 != 0) plus++;
+        int iRows = 1;
+        worksheet.Cells[$"A{plus + 2 + numberOfMachines / 2}"].Value = "Spinning machine";
+        worksheet.Cells[$"A{plus + 2 + 1 + numberOfMachines * 1 + numberOfMachines / 2}"].Value = "Prod68 1";
+        worksheet.Cells[$"A{plus + 2 + 2 + numberOfMachines * 2 + numberOfMachines / 2}"].Value = "Prod68 2";
+        worksheet.Cells[$"A{plus + 2 + 3 + numberOfMachines * 3 + numberOfMachines / 2}"].Value = "Prod59";
+        worksheet.Cells[$"A{plus + 2 + 4 + numberOfMachines * 4 + numberOfMachines / 2}"].Value = "Sizing, ironing";
+        worksheet.Cells[$"A{plus + 2 + 5 + numberOfMachines * 5 + numberOfMachines / 2}"].Value = "Packaging";
+        ExtenstionsStation[,] extenstionsStation = new ExtenstionsStation[6, numberOfMachines];
+        for (int i = 0; i < 6; i++)
+        {
+            for (int j = 0; j < numberOfMachines; j++)
+            {
+                iRows++;
+                if (j == 0) iRows++;
+                worksheet.Cells[iRows, 2].Value = j + 1;
+                extenstionsStation[i, j] = new ExtenstionsStation(iRows,3);
+            }
+        }
+        return extenstionsStation;
+    }
+    public static void WriteStationProcessOrder(ExcelPackage package, ExcelWorksheet worksheet, int numberOfMachines, List<Order> orderList, ExtenstionsStation[,] extenstionsStation)
+    {
+        foreach (Order order in orderList) 
+        {
+            for (int i = 0; i < order.Steps.Count; i++)
+            {
+                if (order.Steps[i].RequireTime != 0)
+                {
+                    worksheet.Cells[extenstionsStation[i, order.Steps[i].MachineProcess].Row, extenstionsStation[i, order.Steps[i].MachineProcess].Column++].Value = order.Id;
+                    Debug.WriteLine($"Order{order.Id} -> Step {i + 1} -> Duration {order.Steps[i].RequireTime}");
+                }
+            }
+        }
+    }
     public static List<int> GetOrderOrders(string filePath)
     {
         List<int> result = new List<int>();
@@ -120,5 +187,21 @@ public class Extenstions
         };
 
         return result;
+    }
+}
+
+public class ExtenstionsStation
+{
+    public int Row { get; set; }
+    public int Column { get; set; }
+    public ExtenstionsStation(int Row, int Column) 
+    {
+        this.Row = Row;
+        this.Column = Column;
+    }
+
+    public override string? ToString()
+    {
+        return $"Row: {Row} - Column: {Column}";
     }
 }
