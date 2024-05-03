@@ -30,9 +30,9 @@ namespace hopeless.SimulatedAnnealing.Visualize
             Extenstions.WriteExcelWithEPPlus(@"C:\Data\OneDrive - a151620\Data\testExcel.xlsx", numberOfMachines, firstOrders, bestOrders);
             double time = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrders);
             List<OrderHasColor> orderHasColors = InitializeGanttChart(bestOrders);
-            Debug.WriteLine("Delta T: " + time.ToString("F3"));
-            Debug.WriteLine("\n");
-            bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
+            //Debug.WriteLine("Delta T: " + time.ToString("F3"));
+            //Debug.WriteLine("\n");
+            //bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
             //new OrderColor(orderHasColors).Show();
 
             //new FirstProcess(firstOrders, orderHasColors, SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrders)).Show();

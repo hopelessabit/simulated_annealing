@@ -104,10 +104,9 @@ public static class SimulatedAnnealingAlgV2
 
             double acceptanceProbability = AcceptanceProbability(currentEnergy, neighborEnergy, temp);
             double r = Random.NextDouble();
-            Debug.Write($"current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")} \t\t|{r.ToString("F3")} < {acceptanceProbability.ToString("F3")} : {r < acceptanceProbability} |\t");
+            Debug.Write($"temp: {temp} -> current: {currentEnergy.ToString("F3")} - neighbor: {neighborEnergy.ToString("F3")} \t\t|{r.ToString("F5")} < {acceptanceProbability.ToString("F5")} : {r < acceptanceProbability} |\n");
             if (r < acceptanceProbability)
             {
-                Debug.WriteLine("==== " + (r < acceptanceProbability).ToString());
                 currentSolutionFactory = neighborSolutionFactory;
                 currentEnergy = neighborEnergy;
             }
@@ -119,8 +118,6 @@ public static class SimulatedAnnealingAlgV2
         }
         tempPoints.Add(new DataPoint(count, Math.Round(currentEnergy / 100, 2)));
 
-        Debug.WriteLine("\n");
-        currentSolutionFactory.Orders.ForEach(o => Debug.Write($"{o.Id} -> "));
         return currentSolutionFactory.Orders;
     }
     public static List<Order> Process()
@@ -174,7 +171,9 @@ public static class SimulatedAnnealingAlgV2
         {
             return 1.0;
         }
-        var a =  Math.Exp((currentEnergy - neighborEnergy) / (temperature));
+        //Debug.WriteLine($"({currentEnergy} - {neighborEnergy}) / {temperature}");
+        if (currentEnergy - neighborEnergy < 0)
+            return 1 / (Math.Exp((neighborEnergy - currentEnergy) / (temperature)));
         return Math.Exp((currentEnergy - neighborEnergy) / (temperature));
     }
 
@@ -188,7 +187,7 @@ public static class SimulatedAnnealingAlgV2
         List<Order> neighborList = CloneListOrder(orders);
         int index1 = Random.Next(0, neighborList.Count);
         int index2 = Random.Next(0, neighborList.Count);
-        Debug.WriteLine($"\t\t -------------SWAP: {neighborList[index1].Id} <-> {neighborList[index2].Id}");
+        //Debug.WriteLine($"\t\t -------------SWAP: {neighborList[index1].Id} <-> {neighborList[index2].Id}");
         Order temp = neighborList[index1];
         neighborList[index1] = neighborList[index2];
         neighborList[index2] = temp;

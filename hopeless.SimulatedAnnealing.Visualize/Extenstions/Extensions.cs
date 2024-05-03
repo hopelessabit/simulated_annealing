@@ -157,7 +157,7 @@ public class Extenstions
                 if (order.Steps[i].RequireTime != 0)
                 {
                     worksheet.Cells[extenstionsStation[i, order.Steps[i].MachineProcess].Row, extenstionsStation[i, order.Steps[i].MachineProcess].Column++].Value = order.Id;
-                    Debug.WriteLine($"Order{order.Id} -> Step {i + 1} -> Duration {order.Steps[i].RequireTime}");
+                    //Debug.WriteLine($"Order{order.Id} -> Step {i + 1} -> Duration {order.Steps[i].RequireTime}");
                 }
             }
         }
