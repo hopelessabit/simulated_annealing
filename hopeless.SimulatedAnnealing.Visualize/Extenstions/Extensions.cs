@@ -104,13 +104,13 @@ public class Extenstions
         {
             // Create a new worksheet
             var worksheet = package.Workbook.Worksheets.Add("FirstOrder");
-            worksheet.Cells[1, 1].Value = "Overdue";
+            worksheet.Cells[1, 1].Value = "Total Tardiness";
             worksheet.Cells[1, 2].Value = SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrderList);
             ExtenstionsStation[,] extenstionsStations = WriteOutLine(package, worksheet, numberOfMachines);
             WriteStationProcessOrder(package, worksheet, numberOfMachines, firstOrderList, extenstionsStations);
             // Create a new worksheet
             worksheet = package.Workbook.Worksheets.Add("BestOrder");
-            worksheet.Cells[1, 1].Value = "Overdue";
+            worksheet.Cells[1, 1].Value = "Total Tardiness";
             worksheet.Cells[1, 2].Value = SimulatedAnnealingAlgV2.CalculateOverdueTime(bestOrderList);
             extenstionsStations = WriteOutLine(package, worksheet, numberOfMachines);
             WriteStationProcessOrder(package, worksheet, numberOfMachines, bestOrderList, extenstionsStations);

@@ -1,16 +1,7 @@
 ﻿using OxyPlot;
 using OxyPlot.Axes;
 using OxyPlot.Series;
-using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Diagnostics;
-using System.Drawing;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace hopeless.SimulatedAnnealing.Visualize
@@ -41,7 +32,7 @@ namespace hopeless.SimulatedAnnealing.Visualize
             plotModel.Axes.Add(xAxis);
 
             // Add and configure Y-axis
-            var yAxis = new LinearAxis { Position = AxisPosition.Left, Title = "Overdue Time (100s)" };
+            var yAxis = new LinearAxis { Position = AxisPosition.Left, Title = "Total Tardiness (100s)" };
             plotModel.Axes.Add(yAxis);
 
             // Set the PlotModel to the PlotView

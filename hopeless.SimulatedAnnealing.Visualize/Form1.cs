@@ -33,9 +33,9 @@ namespace hopeless.SimulatedAnnealing.Visualize
             //Debug.WriteLine("Delta T: " + time.ToString("F3"));
             //Debug.WriteLine("\n");
             //bestOrders.ForEach(o => Debug.Write($"{o.Id} -> "));
-            //new OrderColor(orderHasColors).Show();
+            new OrderColor(orderHasColors).Show();
 
-            //new FirstProcess(firstOrders, orderHasColors, SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrders)).Show();
+            new FirstProcess(firstOrders, orderHasColors, SimulatedAnnealingAlgV2.CalculateOverdueTime(firstOrders)).Show();
 
             new ObjectiveFunctionChart(tempPoints).Show();
         }

@@ -106,7 +106,7 @@ public class GanttChart : UserControl
             g.FillRectangle(new SolidBrush(task.Color), startX, startY, width, height);
         }
         g.DrawString($"Total Time(s): {TotalTime.ToString("F3")}", taskFont, Brushes.Black, 0, 0);
-        g.DrawString($"Overdue Time(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
+        g.DrawString($"Total Tardiness(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
     }
     public void DrawFirstProcessGanttChart(Graphics g)
     {
@@ -139,6 +139,6 @@ public class GanttChart : UserControl
 
         }
         g.DrawString($"Total Time(s): {TotalTime.ToString("F3")}", taskFont, Brushes.Black, 0, 0);
-        g.DrawString($"Overdue Time(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
+        g.DrawString($"Total Tardiness(s): {OverdueTime.ToString("F3")}", taskFont, Brushes.Black, 0, 20);
     }
 }
