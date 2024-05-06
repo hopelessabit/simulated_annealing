@@ -8,7 +8,7 @@ public class GanttChart : UserControl
     private static int A = 0;
     private readonly Pen taskPen = new Pen(Color.Black);
     private readonly Brush taskBrush = new SolidBrush(Color.LightBlue);
-    private readonly Font taskFont = new Font("Arial", 8);
+    private readonly Font taskFont = new Font("Arial", 5);
     private readonly int taskHeight = 20;
     private double TotalTime { get; set; } = 0;
     private double OverdueTime { get; set; } = 0;
@@ -78,7 +78,7 @@ public class GanttChart : UserControl
 
     public void DrawFullProcessGanttChart(Graphics g)
     {
-
+        int month = 5;
         for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
         {
             int startY = 18;
@@ -87,9 +87,12 @@ public class GanttChart : UserControl
             float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
-            g.DrawString($"{(3 + i).ToString("D2")}/05/2023", taskFont, Brushes.Black, (float)(170 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+            if (3 + i < 31)
+                g.DrawString($"{(3 + i).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+            else
+                g.DrawString($"{(i - 27).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
         }
-        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/05/2023", taskFont, Brushes.Black, 1550, 155 + 150 * 5);
+        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
 
 
         //Draw tasks
@@ -110,7 +113,7 @@ public class GanttChart : UserControl
     }
     public void DrawFirstProcessGanttChart(Graphics g)
     {
-
+        int month = 5;
         for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
         {
             int startY = 18;
@@ -119,9 +122,12 @@ public class GanttChart : UserControl
             float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
-            g.DrawString($"{(3 + i).ToString("D2")}/05/2023", taskFont, Brushes.Black, (float)(170 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+            if (3 + i < 31)
+                g.DrawString($"{(3 + i).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+            else
+                g.DrawString($"{(i - 27).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
         }
-        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/05/2023", taskFont, Brushes.Black, 1550, 155 + 150 * 5);
+        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
 
 
         //Draw tasks
