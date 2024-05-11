@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using System;
 using System.Diagnostics;
+using static System.Windows.Forms.AxHost;
 
 public class GanttChart : UserControl
 {
@@ -84,7 +85,7 @@ public class GanttChart : UserControl
             int startY = 18;
             int height = 150 * 6;
 
-            float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
+            float startX = 200 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
             if (3 + i < 31)
@@ -114,12 +115,12 @@ public class GanttChart : UserControl
     public void DrawFirstProcessGanttChart(Graphics g)
     {
         int month = 5;
+        int startY = 18;
         for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
         {
-            int startY = 18;
             int height = 150 * 6;
 
-            float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
+            float startX = 200 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
             if (3 + i < 31)
@@ -134,7 +135,7 @@ public class GanttChart : UserControl
         for (int i = 0; i < tasks.Count; i++)
         {
             Task task = tasks[i];
-            int startY = (task.StationId) * (130 + 20) + (task.MachineId) * (20 + 3) + 20;
+            startY = (task.StationId) * (130 + 20) + (task.MachineId) * (20 + 3) + 20;
             int height = taskHeight;
 
 
