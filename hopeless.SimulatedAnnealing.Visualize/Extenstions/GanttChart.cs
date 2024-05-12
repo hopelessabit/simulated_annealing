@@ -87,12 +87,14 @@ public class GanttChart : UserControl
             float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
-            if (3 + i < 31)
+            if (3 + i < 32)
                 g.DrawString($"{(3 + i).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
-            else
+            else{
                 g.DrawString($"{(i - 27).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+                month++;
+            }
         }
-        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
+        g.DrawString($"{3 + ((Math.Ceiling(TotalTime / 57600) + 1)%31)}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
 
 
         //Draw tasks
@@ -122,12 +124,14 @@ public class GanttChart : UserControl
             float startX = 400 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
-            if (3 + i < 31)
+            if (3 + i < 32)
                 g.DrawString($"{(3 + i).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
-            else
+            else{
                 g.DrawString($"{(i - 27).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
+                month++;
+            }
         }
-        g.DrawString($"{3 + (Math.Ceiling(TotalTime / 57600) + 1)}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
+        g.DrawString($"{3 + ((Math.Ceiling(TotalTime / 57600) + 1))%31}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
 
 
         //Draw tasks
