@@ -104,7 +104,12 @@ public class GanttChart : UserControl
             }
             g.DrawString($"{day.ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
         }
-        g.DrawString($"{3 + ((Math.Ceiling(TotalTime / 57600) + 1)%31)}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
+        if (month == 7 && day > 31)
+        {
+            day = 1;
+            month++;
+        }
+        g.DrawString($"{(day + 1).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
 
 
         //Draw tasks
@@ -126,37 +131,45 @@ public class GanttChart : UserControl
     public void DrawFirstProcessGanttChart(Graphics g)
     {
         int month = 5;
-        int startY = 18;
+        int day = 0;
         for (int i = 0; i < Math.Ceiling(TotalTime / 57600); i++)
         {
+            day++;
+            int startY = 18;
             int height = 150 * 6;
 
             float startX = 200 + (float)(1400 / Math.Ceiling(TotalTime / 57600) * i);
             float width = 3;
             g.FillRectangle(new SolidBrush(Color.FromArgb(255, 255, 255, 255)), startX, startY, width, height);
-            if (month == 5 && day > 31) {
+            if (month == 5 && day > 31)
+            {
                 day = 1;
                 month++;
             }
-            else if (month == 6 && day > 30){
-                day =1;
+            else if (month == 6 && day > 30)
+            {
+                day = 1;
                 month++;
             }
-            else if (month == 7 && day > 31) {
-                day =1;
+            else if (month == 7 && day > 31)
+            {
+                day = 1;
                 month++;
             }
             g.DrawString($"{day.ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, (float)(190 + i * (1400 / Math.Ceiling(TotalTime / 57600))), 155 + 150 * 5);
-
         }
-        g.DrawString($"{3 + ((Math.Ceiling(TotalTime / 57600) + 1))%31}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
-
+        if (month == 7 && day > 31)
+        {
+            day = 1;
+            month++;
+        }
+        g.DrawString($"{(day + 1).ToString("D2")}/{month.ToString("00")}", taskFont, Brushes.Black, 1590, 155 + 150 * 5);
 
         //Draw tasks
         for (int i = 0; i < tasks.Count; i++)
         {
             Task task = tasks[i];
-            startY = (task.StationId) * (130 + 20) + (task.MachineId) * (20 + 3) + 20;
+            int startY = (task.StationId) * (130 + 20) + (task.MachineId) * (20 + 3) + 20;
             int height = taskHeight;
 
 
